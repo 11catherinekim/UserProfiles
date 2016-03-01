@@ -1,0 +1,426 @@
+@model Datalus.Web.Models.ViewModels.UserProfileViewModel
+
+@{
+    ViewBag.Title = "Create";
+}
+<head>
+    <link href="~/Content/ProfileStyleSheet.css" rel="stylesheet" />
+
+
+    <style type="text/css">
+        .accordionBar {
+            background-color: azure;
+            height: 40px;
+        }
+
+        .panel-heading {
+            padding: 0px;
+        }
+
+        .btn-icon.btn-default {
+            background-color: #819ac9;
+        }
+    </style>
+
+
+</head>
+
+<div data-ng-controller="createUserProfileController as dashboard">
+    <div class="row">
+        <div data-ng-include="'profilePanel.html'"></div>
+        <div class="googleMapContainer" style="padding-left:340px;">
+            <div id="map-canvas"></div>
+        </div>
+    </div>
+
+</div>
+<script type="text/ng-template" id="profilePanel.html">
+    <div class="panel" data-fill-color="true">
+        <div class="datalusTopLogo">
+            <p class="text-center p-4x">
+                <img type="image/png" src="https://datalus-img.s3-us-west-2.amazonaws.com/Datalus_Logo.png" height="75">
+            </p>
+            <p class="text-center lead">Edit Profile</p>
+        </div>
+
+        <div class=" col-md-6">
+            <div class="col-md-12" style="padding-top:30px;">
+
+                <uib-accordion close-others="true" class="accordionBar">
+                    <uib-accordion-group is-open="status.open">
+                        <uib-accordion-heading>
+                            <button ng-click="dashboard.dropPersonalInformation()" class="btn btn-icon btn-default " style="margin: auto; width: 100%" title="Read More">
+                                <h4>Personal Information</h4>
+                            </button>
+                        </uib-accordion-heading>
+                        <form id="userProfileForm" role="form" name="dashboard.userProfileForm" ng-submit="dashboard.submitUserProfile()" novalidate>
+
+                            <div class="form-group has-feedback" hidden>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="icon-tag"></i></span>
+                                    <input type="text" class="form-control" id="id" ng-init="@Model.Id" placeholder="" name="id" data-ng-model="dashboard.userProfile.id">
+                                    <span class="form-control-feedback"></span>
+                                </div>
+                            </div><!-- /.form-group -->
+                            
+                            <div class="form-group has-feedback">
+                                <label for="inputSelect">First Name*</label>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="icon-tag"></i></span>
+                                    <input type="text"
+                                           required
+                                           name="FirstName"
+                                           id="FirstName"
+                                           class="form-control"
+                                           placeholder="First Name"
+                                           data-ng-model="dashboard.userProfile.firstName">
+                                </div>
+                                <div role="alert" class="help-inline error">
+                                    <span class="error" ng-show="dashboard.showFormErrors && dashboard.userProfileForm.FirstName.$error.required">First Name is required</span>
+                                </div>
+                            </div><!-- /.form-group -->
+
+                            <div class="form-group has-feedback">
+                                <label for="inputSelect">Last Name*</label>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="icon-tag"></i></span>
+                                    <input type="text"
+                                           required
+                                           name="LastName"
+                                           id="LastName"
+                                           class="form-control"
+                                           placeholder="Last Name"
+                                           data-ng-model="dashboard.userProfile.lastName">
+                                </div>
+                                <div role="alert" class="help-inline error">
+                                    <span class="error" ng-show="dashboard.showFormErrors && dashboard.userProfileForm.LastName.$error.required">Last Name is required</span>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group has-feedback" ng-class="error('DateOfBirth')">
+                                <label for="inputSelect">Date Of Birth*</label>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
+                                    <input type="date"
+                                           required
+                                           name="DateOfBirth"
+                                           id="DateOfBirth"
+                                           class="form-control ng-class:{'error': dashboard.showFormErrors && !dashboard.userProfileForm.DateOfBirth.$valid}"
+                                           placeholder=""
+                                           data-ng-model="dashboard.userProfile.dateOfBirth">
+
+                                </div>
+                                <div role="alert" class="help-inline error">
+                                    <span class="error" ng-show="dashboard.showFormErrors && dashboard.userProfileForm.DateOfBirth.$error.required">Date of Birth is required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="inputSelect">Gender*</label>
+                                <select type="text"
+                                        required
+                                        class="form-control"
+                                        name="Sex"
+                                        min-length="2"
+                                        id="Sex"
+                                        ng-model="dashboard.userProfile.sex">
+                                    <option value="">- Select One -</option>
+                                    <option value="Unknown">Not Specified/Other</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                                <div role="alert" class="help-inline error">
+                                    <span class="error" ng-show="dashboard.showFormErrors && dashboard.userProfileForm.Sex.$error.required">Gender is required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="inputSelect">Ethnicity*</label>
+                                <select type="text"
+                                        class="form-control"
+                                        id="Ethnicity"
+                                        required
+                                        min-length="2"
+                                        name="Ethnicity"
+                                        data-ng-model="dashboard.userProfile.ethnicity">
+                                    <option value="">- Select One -</option>
+                                    <option value="Unknown">Not Specified/Other</option>
+                                    <option value="AmericanIndian">American Indian</option>
+                                    <option value="White">White/Caucasian</option>
+                                    <option value="Black">Black/African American</option>
+                                    <option value="Hawaiian">Native Hawaiian or other Pacific Islander</option>
+                                    <option value="Hispanic">Hispanic or Latino</option>
+                                </select>
+                                <div role="alert" class="help-inline error">
+                                    <span class="error" ng-show="dashboard.showFormErrors && dashboard.userProfileForm.Ethnicity.$error.required">Ethnicity is required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group has-feedback">
+                                <label for="inputSelect">Interests</label>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="icon-tag"></i></span>
+                                    <input type="text"
+                                           name="Interest"
+                                           id="Interest"
+                                           class="form-control"
+                                           placeholder="Interest"
+                                           data-ng-model="dashboard.userProfile.interest">
+                                    <span class="form-control-feedback"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group has-feedback">
+                                <label for="inputSelect">Website</label>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="icon-tag"></i></span>
+                                    <input type="text"
+                                           name="Website"
+                                           id="Website"
+                                           class="form-control"
+                                           placeholder="Website"
+                                           data-ng-model="dashboard.userProfile.website">
+                                    <span class="form-control-feedback"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group has-feedback">
+                                <label for="inputSelect">Telephone</label>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="icon-screen-smartphone"></i></span>
+                                    <input type="tel"
+                                           id="Phone"
+                                           name="Phone"
+                                           class="form-control"
+                                           placeholder="000-000-0000"
+                                           data-ng-model="dashboard.userProfile.phone">
+                                    <span class="form-control-feedback"></span>
+                                </div><!-- /input-group-in -->
+                            </div>
+
+                            <div class="form-group has-feedback">
+                                <label for="inputSelect">Address Line 1*</label>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="icon-tag"></i></span>
+                                    <input type="text"
+                                           required
+                                           name="addressLine1"
+                                           id="addressLine1"
+                                           class="form-control"
+                                           placeholder="Address Line 1"
+                                           data-ng-model="dashboard.userProfile.addressLine1">
+                                </div>
+                                <div role="alert" class="help-inline error">
+                                    <span class="error" ng-show="dashboard.showFormErrors && dashboard.userProfileForm.addressLine1.$error.required">Address is required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group has-feedback">
+                                <label for="inputSelect">Address Line 2</label>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="icon-tag"></i></span>
+                                    <input type="text"
+                                           name="addressLine2"
+                                           id="addressLine2"
+                                           class="form-control"
+                                           placeholder="Address Line 2"
+                                           data-ng-model="dashboard.userProfile.addressLine2">
+                                    <span class="form-control-feedback"></span>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="Countries">Country*</label>
+                                <select class="form-control"
+                                        id="countries"
+                                        required
+                                        name="countries"
+                                        data-ng-model="dashboard.userProfile.countryId"
+                                        data-ng-options="country.countryId as country.name for country in dashboard.countries"
+                                        data-ng-change="dashboard.onCountryChange()">
+                                    <option value="C0">Please select a Country</option>
+                                </select>
+                                <div role="alert" class="help-inline error">
+                                    <span class="error" ng-show="dashboard.showFormErrors && dashboard.userProfileForm.countries.$error.required">Country is required</span>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="control-label" for="state">State*</label>
+                                <select type="text"
+                                        class="form-control"
+                                        required
+                                        name="state"
+                                        id="state"
+                                        data-ng-options="state.stateProvinceId as state.name for state in dashboard.states"
+                                        placeholder="State"
+                                        data-ng-model="dashboard.userProfile.stateProvinceId">
+                                    <option id="S0" value="0"> Please select a State</option>
+                                </select>
+                                <div role="alert" class="help-inline error">
+                                    <span class="error" ng-show="dashboard.showFormErrors && dashboard.userProfileForm.state.$error.required">State is required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group has-feedback">
+                                <label for="inputSelect">City*</label>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="icon-tag"></i></span>
+                                    <input type="text"
+                                           name="City"
+                                           required
+                                           id="City"
+                                           class="form-control"
+                                           placeholder="City"
+                                           data-ng-model="dashboard.userProfile.city">
+                                </div>
+                                <div role="alert" class="help-inline error">
+                                    <span class="error" ng-show="dashboard.showFormErrors && dashboard.userProfileForm.City.$error.required">City is required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group has-feedback">
+                                <label for="inputSelect">ZipCode*</label>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="icon-tag"></i></span>
+                                    <input type="text"
+                                           required
+                                           name="zipcode"
+                                           id="zipcode"
+                                           class="form-control"
+                                           placeholder="Please enter the ZipCode"
+                                           data-ng-model="dashboard.userProfile.zipCode">
+                                </div>
+                                <div role="alert" class="help-inline error">
+                                    <span class="error" ng-show="dashboard.showFormErrors && dashboard.userProfileForm.zipcode.$error.required">Zipcode is required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group animated-hue clearfix">
+                                <div class="text-center">
+                                    <button type="submit" id="cmduserprofilesubmit" value="Submit" class="pull-left btn btn-primary">Submit</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </uib-accordion-group>
+                </uib-accordion>
+
+                <uib-accordion close-others="true" class="accordionBar">
+                    <uib-accordion-group is-open="status.open">
+                        <uib-accordion-heading>
+                            <button ng-click="dashboard.dropEducationInformation()" class="btn btn-icon btn-default " style="margin: auto; width: 100%" title="Read More">
+                                <h4>Educational History</h4>
+                            </button>
+                        </uib-accordion-heading>
+                        <div class="form-group">
+                            <label class="control-label" for="educations">Educational History</label>
+                            <br />
+                            <br />
+                            <div class="pull-left mb-1x" id="formButtons">
+                                <a href="/Educations/{{dashboard.userProfile.id}}/create" id="createEducationPage" class="btn btn-primary"><span ng-bind="dashboard.createEducation"></span>Record New Entry</a>
+                            </div><br />
+                            <br />
+                            <div class="educationsIndex">
+
+                                <div class="educationsList" ng-repeat="education in dashboard.educations">
+                                    <div class="form-group">
+                                        <b>Start Date:</b>{{education.startDate}} <br />
+                                        <b>Graduation Date:</b> {{education.endDate}}<br />
+                                        <b>School Name:</b> {{education.schoolName}}<br />
+                                        <b>Major:</b> {{education.major}}<br />
+                                        <b>Degree:</b> {{education.degree}}<br />
+                                        <a href="/Educations/{{dashboard.userProfile.id}}/{{education.id}}/edit" id="editEducationPage" class="btn btn-default pull-right"><span ng-bind="dashboard.createEducation"></span>Edit</a>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </uib-accordion-group>
+                </uib-accordion>
+                <uib-accordion close-others="true" class="accordionBar">
+                    <uib-accordion-group is-open="status.open">
+                        <uib-accordion-heading>
+                            <button ng-click="dashboard.dropEmploymentInformation()" class="btn btn-icon btn-default " style="margin: auto; width: 100%" title="Read More">
+                                <h4>Employment History</h4>
+                            </button>
+                        </uib-accordion-heading>
+                        <form id="employmentForm" role="form" name="dashboard.employmentForm" ng-submit="" novalidate>
+
+                            <div class="form-group has-feedback">
+                                <label for="inputSelect">Preferred Employer</label>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="icon-tag"></i></span>
+                                    <input type="text"
+                                           name="PreferredEmployer"
+                                           id="PreferredEmployer"
+                                           class="form-control"
+                                           placeholder="Preferred Employer"
+                                           data-ng-model="dashboard.userProfile.preferredEmployer">
+                                    <span class="form-control-feedback"></span>
+                                </div>
+                            </div>
+                            <div class="form-group has-feedback">
+                                <label for="inputSelect">Employment Status</label>
+                                <div class="input-group input-group-in">
+                                    <span class="input-group-addon"><i class="icon-tag"></i></span>
+                                    <select type="text"
+                                            name="EmploymentStatus"
+                                            id="EmploymentStatus"
+                                            class="form-control"
+                                            placeholder="Employment Status"
+                                            data-ng-model="dashboard.userProfile.employmentStatus">
+                                        <option>- Select One -</option>
+                                        <option value="Other">Not Specified/Other</option>
+                                        <option>Employed</option>
+                                        <option value="SelfEmployed">Self-Employed</option>
+                                        <option>Unemployed</option>
+                                        <option>Student</option>
+                                        <option>Retired</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="employments">Employment History</label>
+                                <br />
+                                <br />
+                                <div class="pull-left mb-1x" id="formButtons">
+                                    <a href="/Employments/{{dashboard.userProfile.id}}/create" id="createEmploymentPage" class="btn btn-primary"><span ng-bind="dashboard.createEmployment"></span>Create New Employment</a>
+                                </div><br />
+                                <br />
+                                <div class="employmentsIndex">
+
+                                    <div class="employmentsList" ng-repeat="employment in dashboard.employments">
+                                        <div class="form-group">
+                                            <b>Start Date:</b>{{employment.startDate}} <br />
+                                            <b>End Date:</b> {{employment.endDate}}<br />
+                                            <b>Company Name:</b> {{employment.companyName}}<br />
+                                            <b>Job Title:</b> {{employment.jobTItle}}<br />
+                                            <b>Department:</b> {{employment.department}}<br />
+                                            <b>Location:</b> {{employment.location}}<br />
+                                            <b>Summary:</b> {{employment.summaryOfJob}}<br />
+                                            <a href="/Employments/{{dashboard.userProfile.id}}/{{employment.id}}/edit" id="editEmploymentPage" class="btn btn-default pull-right"><span ng-bind="dashboard.createEmployment"></span>Edit</a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group animated-hue clearfix">
+                                <div class="text-center">
+                                    <button type="submit" value="Submit" class="pull-left btn-primary">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </uib-accordion-group>
+                </uib-accordion>
+            </div>
+        </div>
+    </div><!-- /.form-group -->
+
+</script>
